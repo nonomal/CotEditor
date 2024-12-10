@@ -244,7 +244,9 @@ private enum BundleIdentifier {
         
         // programmatically setting `automaticTerminationSupportEnabled` seems not working (macOS 15.1 2024-11, FB15979536)
         ProcessInfo.processInfo.automaticTerminationSupportEnabled = true
-        ProcessInfo.processInfo.enableSuddenTermination()
+        if Document.autosavesInPlace {
+            ProcessInfo.processInfo.enableSuddenTermination()
+        }
         
         _ = DocumentController.shared
         
@@ -436,7 +438,7 @@ private enum BundleIdentifier {
     }
     
     
-    /// Opens OSAScript dictionary in Script Editor.
+    /// Opens OSA script dictionary in Script Editor.
     @IBAction func openAppleScriptDictionary(_ sender: Any?) {
         
         guard let scriptEditorURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: BundleIdentifier.scriptEditor) else { return }

@@ -341,7 +341,7 @@ final class EditorTextView: NSTextView, CurrentLineHighlighting, MultiCursorEdit
                 self?.enclosingScrollView?.drawsBackground = $0
             }
         
-        // observe key window state for insertion points drawing and automatic period substition
+        // observe key window state for insertion points drawing and automatic period substitution
         if let window {
             self.keyStateObservers = [
                 NotificationCenter.default.addObserver(forName: NSWindow.didBecomeKeyNotification, object: window, queue: .main) { [unowned self] _ in
@@ -1423,7 +1423,7 @@ final class EditorTextView: NSTextView, CurrentLineHighlighting, MultiCursorEdit
     
     /// Updates the app-wide automatic period substation behavior based on the receiver's `mode`.
     ///
-    /// Workaround for that the view-specific API to customize this behavior is currently not available  (macOS 15, 2024-11, FB13669125).
+    /// Workaround for that the view-specific API to customize this behavior is currently not available (macOS 15, 2024-11, FB13669125).
     private func invalidateAutomaticPeriodSubstitution() {
         
         if self.window?.firstResponder == self {

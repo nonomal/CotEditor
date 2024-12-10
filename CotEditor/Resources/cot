@@ -34,7 +34,7 @@ from subprocess import Popen, PIPE, CalledProcessError
 
 
 # meta data
-__version__ = '2.10.0'
+__version__ = '2.10.1'
 __description__ = 'command-line utility for CotEditor.'
 
 
@@ -81,10 +81,10 @@ def bundle_path():
 # MARK: OSA Script
 
 def run_osascript(script, is_async=False):
-    """Run osascript.
+    """Run OSA script.
 
     Args:
-        script (str): Osascript.
+        script (str): OSA script.
         is_async (bool): If need to wait for finish.
     Returns:
         result (str): Return value of the script.
@@ -114,6 +114,19 @@ class ScriptableApplication(object):
 
     def __init__(self, name):
         self.name = name
+
+    def is_running(self):
+        """Check if the app is running.
+
+        Returns:
+            result (bool): Is the app running?
+        """
+        script = 'app "{}" is running'.format(self.name)
+        try:
+            return run_osascript(script) == 'true'
+        except CalledProcessError as error:
+            self._attempt_recovery(error)
+            raise error
 
     def tell(self, script, is_async=False):
         """Tell OSA command to the application.
@@ -149,9 +162,7 @@ class ScriptableApplication(object):
             path (str): Path to file.
         """
         path = path.replace('\\', '\\\\').replace('"', '\\"')
-        self.tell('open POSIX file "{}"'.format(path), is_async=True)
-        # -> Opening a file that is already opened in the application takes
-        #    somehow extremely long time. So, we don't wait.
+        self.tell('open POSIX file "{}"'.format(path))
 
     def tell_document(self, script, index=1):
         """Tell OSA command to a document of the application.
@@ -198,7 +209,7 @@ class ScriptableApplication(object):
         """Attempt recovery from CalledProcessError.
 
         Args:
-            error (CalledProcessError): Error via osascript.
+            error (CalledProcessError): Error via OSA script.
         """
         if '(-1743)' in error.output:
             # show recovery suggestion for authorization error with
@@ -364,7 +375,7 @@ def main(args, stdin):
     # wait for window close
     if args.wait and (len(args.files) == 1 or stdin or args.new_window):
         window_id = app.window_id()
-        while app.window_exists(window_id):
+        while app.is_running() and app.window_exists(window_id):
             time.sleep(WAIT_INTERVAL)
 
         # raise client window to the front
